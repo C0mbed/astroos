@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows10.0.22000.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.22000.0</TargetPlatformMinVersion>
+    <RootNamespace>AstroOS.UI</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Platforms>x64</Platforms>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <UseWinUI>true</UseWinUI>
+    <EnableMsixTooling>false</EnableMsixTooling>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <SelfContained>true</SelfContained>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250228002" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="CommunityToolkit.WinUI.UI" Version="8.1.240916" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AstroOS.Core\AstroOS.Core.csproj" />
+    <ProjectReference Include="..\AstroOS.Hardware\AstroOS.Hardware.csproj" />
+    <ProjectReference Include="..\AstroOS.Sequencer\AstroOS.Sequencer.csproj" />
+    <ProjectReference Include="..\AstroOS.Scheduler\AstroOS.Scheduler.csproj" />
+    <ProjectReference Include="..\AstroOS.Safety\AstroOS.Safety.csproj" />
+    <ProjectReference Include="..\AstroOS.Api\AstroOS.Api.csproj" />
+    <ProjectReference Include="..\AstroOS.Storage\AstroOS.Storage.csproj" />
+  </ItemGroup>
+</Project>

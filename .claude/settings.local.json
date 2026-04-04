@@ -2,7 +2,22 @@
   "permissions": {
     "allow": [
       "Bash(git add:*)",
-      "Bash(git commit -m ':*)"
+      "Bash(git commit -m ':*)",
+      "Bash(git checkout:*)",
+      "Bash(unzip -l files.zip)",
+      "Bash(unzip -o files.zip -d files_extracted)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git fetch:*)",
+      "Bash(git rebase:*)",
+      "Bash(git stash:*)",
+      "Bash(unzip:*)",
+      "Bash(cp \"/c/Users/c0mbe/Downloads/Deliverable_v2/BRAND_SYSTEM.md\" \"/c/Users/c0mbe/astroos/docs/BRAND_SYSTEM.md\")",
+      "Bash(cp \"/c/Users/c0mbe/Downloads/Deliverable_v2/app-shell-tech-spec.md\" \"/c/Users/c0mbe/astroos/pipeline/specs/app-shell-tech-spec.md\")",
+      "Bash(cp \"/c/Users/c0mbe/Downloads/Deliverable_v2/status-bar-contract.md\" \"/c/Users/c0mbe/astroos/pipeline/contracts/status-bar-contract.md\")",
+      "Bash(cp \"/c/Users/c0mbe/Downloads/Deliverable_v2/device-dashboard-contract.md\" \"/c/Users/c0mbe/astroos/pipeline/contracts/device-dashboard-contract.md\")",
+      "Bash(cp \"/c/Users/c0mbe/Downloads/Deliverable_v2/safety-system-tech-spec.md\" \"/c/Users/c0mbe/astroos/pipeline/specs/safety-system-tech-spec.md\")",
+      "Bash(git rm:*)"
     ]
   }
 }

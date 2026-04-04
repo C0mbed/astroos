@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Platforms>x64</Platforms>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="9.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AstroOS.Core\AstroOS.Core.csproj" />
+    <ProjectReference Include="..\AstroOS.Hardware\AstroOS.Hardware.csproj" />
+    <ProjectReference Include="..\AstroOS.Sequencer\AstroOS.Sequencer.csproj" />
+  </ItemGroup>
+</Project>

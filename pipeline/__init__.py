@@ -1,1 +1,0 @@
-"""AstroOS imaging pipeline."""

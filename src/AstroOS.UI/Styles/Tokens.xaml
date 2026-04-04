@@ -1,0 +1,10 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- TODO: Dark Sky token layer — translated from docs/design/tokens/ -->
+    <!-- Source: docs/design/tokens/tokens.primitive.css  -->
+    <!--         docs/design/tokens/tokens.semantic.css   -->
+    <!--         docs/design/tokens/tokens.night.css      -->
+    <!-- Map CSS custom properties → XAML ResourceDictionary entries        -->
+    <!-- Night Mode: implement via separate NightModeTokens.xaml merged on toggle -->
+</ResourceDictionary>
