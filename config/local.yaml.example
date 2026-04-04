@@ -1,0 +1,50 @@
+# Copy this file to config/local.yaml and fill in your observatory details.
+# Values here override config/default.yaml.
+# Never commit config/local.yaml — it contains site-specific paths and keys.
+
+observatory:
+  name: "Backyard Observatory"
+  latitude_deg: 51.5074
+  longitude_deg: -0.1278
+  elevation_m: 30
+  timezone: "Europe/London"
+
+hardware:
+  mount:
+    driver: indi_mount
+    config:
+      indi_server: "localhost:7624"
+      device_name: "EQ6-R Pro"
+  camera:
+    driver: zwo_asi
+    config:
+      usb_index: 0
+  focuser:
+    driver: indi_focuser
+    config:
+      device_name: "Moonlite Focuser"
+  filter_wheel:
+    driver: indi_filter_wheel
+    config:
+      device_name: "ZWO EFW"
+      filters: [L, R, G, B, Ha, OIII, SII]
+
+equipment:
+  focal_length_mm: 714
+  pixel_size_micron: 3.76
+  aperture_mm: 102
+
+pipeline:
+  archive_root: "/data/astroos/archive"
+  quarantine_root: "/data/astroos/quarantine"
+  calibration_root: "/data/astroos/calibration"
+  plate_solve_enabled: true
+
+plate_solving:
+  astap:
+    executable: "/usr/local/bin/astap"
+    index_path: "/data/astap/indexes"
+
+api:
+  keys:
+    - "change-me-to-a-real-secret-key"
