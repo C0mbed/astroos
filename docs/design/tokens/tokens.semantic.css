@@ -1,0 +1,206 @@
+/**
+ * tokens.semantic.css
+ * ─────────────────────────────────────────────────────────────────────────────
+ * DARK SKY — Semantic Token Layer
+ *
+ * PURPOSE: Maps primitive values to design intent. This is the ONLY token
+ *          layer that component and layout code should ever reference.
+ *
+ * STRUCTURE:
+ *   :root                   → Dark theme (default — Dark Sky is dark-first)
+ *   [data-theme="light"]    → Light theme overrides
+ *
+ * Night Mode is handled separately in tokens.night.css and layered on top
+ * of whichever theme is active via [data-theme="night"].
+ *
+ * RULES:
+ *   - Components reference var(--color-*), var(--space-*), etc. only.
+ *   - NEVER reference var(--primitive-*) in component code.
+ *   - Status colour tokens carry semantic meaning — do not use them decoratively.
+ *     Using --color-status-nominal on a non-status element is a bug.
+ *
+ * SOURCE: /docs/BRAND_SYSTEM.md §§ 3b, 4, 5, 7, 8, 9
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+/* ── Dark Theme (Default) ───────────────────────────────────────────────────
+ * Applied at :root — no attribute required.
+ * Dark Sky is dark-first; this is the native state of the application.
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+:root {
+
+  /* ── Background ─────────────────────────────────────────────────────────── */
+
+  --color-bg-app:      var(--primitive-dark-900);          /* App chrome, window background        */
+  --color-bg-surface:  var(--primitive-dark-850);          /* Panel and sidebar surfaces           */
+  --color-bg-elevated: var(--primitive-dark-800);          /* Cards, dropdowns, popovers           */
+  --color-bg-input:    var(--primitive-dark-700);          /* Input fields, textareas              */
+  --color-bg-overlay:  rgba(9, 9, 14, 0.72);               /* Modal backdrops                      */
+
+  /* ── Text ───────────────────────────────────────────────────────────────── */
+
+  --color-text-primary:    var(--primitive-dark-100);      /* Primary readable text                */
+  --color-text-secondary:  var(--primitive-dark-300);      /* Supporting text, descriptions        */
+  --color-text-muted:      var(--primitive-dark-400);      /* Timestamps, labels, deemphasised     */
+  --color-text-disabled:   var(--primitive-dark-400);      /* Disabled element text                */
+  --color-text-data:       var(--primitive-dark-050);      /* Monospace telemetry values           */
+
+  /* ── Border ─────────────────────────────────────────────────────────────── */
+
+  --color-border-subtle:   var(--primitive-dark-600);      /* Hairline dividers                    */
+  --color-border-default:  var(--primitive-dark-500);      /* Component borders                    */
+  --color-border-strong:   var(--primitive-dark-400);      /* Focused / active borders             */
+
+  /* ── Interactive ────────────────────────────────────────────────────────── */
+
+  --color-interactive-primary:   var(--primitive-accent-500);        /* Buttons, links, active nav  */
+  --color-interactive-hover:     var(--primitive-accent-400);        /* Hover state                 */
+  --color-interactive-pressed:   var(--primitive-accent-600);        /* Pressed / active state      */
+  --color-interactive-subtle:    rgba(91, 108, 245, 0.12);           /* Hover bg on rows / items    */
+  --color-interactive-disabled:  var(--primitive-dark-600);          /* Disabled interactive        */
+
+  /* ── Status ─────────────────────────────────────────────────────────────── */
+  /* WARN: These tokens carry semantic meaning. Never use for decoration.      */
+
+  --color-status-nominal:        var(--primitive-nominal-text);       /* Nominal / OK indicator      */
+  --color-status-nominal-bg:     var(--primitive-nominal-bg);         /* Nominal background tint     */
+  --color-status-degraded:       var(--primitive-degraded-text);      /* Warning / degraded          */
+  --color-status-degraded-bg:    var(--primitive-degraded-bg);        /* Warning background tint     */
+  --color-status-error:          var(--primitive-error-text);         /* Error / fault               */
+  --color-status-error-bg:       var(--primitive-error-bg);           /* Error background tint       */
+  --color-status-disconnected:   var(--primitive-disconnected-text);  /* Offline / disconnected      */
+  --color-status-safe:           var(--primitive-nominal-text);       /* Safety: all clear           */
+  --color-status-unsafe:         var(--primitive-error-text);         /* Safety: abort               */
+  --color-status-caution:        var(--primitive-degraded-text);      /* Safety: monitor             */
+
+  /* ── Elevation (Shadow) ─────────────────────────────────────────────────── */
+  /* Levels 0–2 use background colour as the distinguishing factor, not shadow. */
+  /* Shadows only appear on overlapping layers (level 3+).                      */
+
+  --elevation-0:  none;                                    /* Flat — app bg, nav                  */
+  --elevation-1:  none;                                    /* Panels — distinguished by bg colour */
+  --elevation-2:  none;                                    /* Cards — distinguished by bg colour  */
+  --elevation-3:  0 2px 8px rgba(0, 0, 0, 0.32);          /* Dropdowns, popovers                 */
+  --elevation-4:  0 8px 32px rgba(0, 0, 0, 0.48);         /* Modals, dialogs                     */
+  --elevation-5:  0 16px 48px rgba(0, 0, 0, 0.64);        /* Critical alerts, safety overlays    */
+
+  /* ── Border Radius ──────────────────────────────────────────────────────── */
+
+  --radius-sm:    4px;     /* Tags, badges, inputs, small buttons             */
+  --radius-md:    6px;     /* Buttons (default), cards (inner)                */
+  --radius-lg:    8px;     /* Cards, panels, popovers                         */
+  --radius-xl:    12px;    /* Modals, sheets, large cards                     */
+  --radius-2xl:   16px;    /* Welcome screen cards, feature cards             */
+  --radius-full:  9999px;  /* Pills, status dots (as needed), toggles         */
+
+  /* ── Spacing ────────────────────────────────────────────────────────────── */
+  /* Base unit: 4px. All values are multiples of 4 (except space-px).         */
+
+  --space-px:  1px;   /* Hairline offsets, border positions                   */
+  --space-1:   4px;   /* Icon-to-label gap, badge padding                     */
+  --space-2:   8px;   /* Internal component padding, tight list gaps          */
+  --space-3:   12px;  /* Input padding, list item padding                     */
+  --space-4:   16px;  /* Standard component padding, card padding-x           */
+  --space-5:   20px;  /* Between related groups in a panel                    */
+  --space-6:   24px;  /* Card padding-y, section internal padding             */
+  --space-8:   32px;  /* Between unrelated groups, section gaps               */
+  --space-10:  40px;  /* Major section separation                             */
+  --space-12:  48px;  /* Panel-level breathing room                           */
+  --space-16:  64px;  /* Screen-level gaps, welcome screen                    */
+
+  /* ── Fixed Component Heights ────────────────────────────────────────────── */
+
+  --height-status-bar:          36px;   /* Fixed — never changes              */
+  --height-nav-rail-width:      56px;   /* Icon-only default                  */
+  --height-nav-rail-expanded:   200px;  /* Expanded with labels               */
+  --height-device-panel:        280px;  /* Right panel (toggleable)           */
+  --height-device-row:          56px;   /* Two-row telemetry layout           */
+  --height-category-header:     24px;   /* Single line                        */
+  --height-panel-header:        40px;   /* With action button                 */
+  --height-input:                36px;  /* Standard input field               */
+  --height-button:               36px;  /* Standard button                    */
+  --height-button-compact:       28px;  /* Toolbar / dense panels             */
+
+  /* ── Motion ─────────────────────────────────────────────────────────────── */
+  /* IMPORTANT: All durations are multiplied by --motion-duration-scale.       */
+  /* This scale is set to 0 when prefers-reduced-motion: reduce is active,     */
+  /* effectively disabling transitions system-wide. Opacity-only fallbacks     */
+  /* are defined per component — see Section 9 of the Brand System.            */
+
+  --motion-duration-scale:   1;   /* Override to 0 for reduced motion         */
+
+  --duration-instant:     calc(80ms  * var(--motion-duration-scale));  /* Button press, toggle flick         */
+  --duration-fast:        calc(150ms * var(--motion-duration-scale));  /* Hover states, micro-interactions   */
+  --duration-normal:      calc(250ms * var(--motion-duration-scale));  /* Panel transitions, state changes   */
+  --duration-slow:        calc(400ms * var(--motion-duration-scale));  /* Page / pane transitions, modals    */
+  --duration-deliberate:  calc(600ms * var(--motion-duration-scale));  /* Welcome screen, onboarding         */
+
+  /* NOTE: Night Mode transition uses --duration-slow (400ms) at ease-standard. */
+  /* WARN: Intermediate transition states must never pass through white.         */
+  /* Test: dark → red only. Never dark → white → red.                           */
+
+  --ease-standard:  cubic-bezier(0.4, 0, 0.2, 1);    /* General transitions                */
+  --ease-enter:     cubic-bezier(0, 0, 0.2, 1);       /* Elements entering the screen       */
+  --ease-exit:      cubic-bezier(0.4, 0, 1, 1);       /* Elements leaving the screen        */
+  --ease-spring:    cubic-bezier(0.34, 1.56, 0.64, 1);/* Mode toggle, delight moments       */
+
+}
+
+/* ── Reduced Motion Override ─────────────────────────────────────────────────
+ * Sets the duration scale to 0, collapsing all calc() duration tokens to 0ms.
+ * Individual components with opacity-only fallbacks implement those separately.
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-duration-scale: 0;
+  }
+}
+
+/* ── Light Theme ─────────────────────────────────────────────────────────────
+ * Applied when [data-theme="light"] is set on <html>.
+ * Only overrides tokens that differ from the dark default.
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+[data-theme="light"] {
+
+  /* Background */
+  --color-bg-app:      var(--primitive-light-950);
+  --color-bg-surface:  var(--primitive-light-900);
+  --color-bg-elevated: var(--primitive-light-850);
+  --color-bg-input:    #FFFFFF;
+  --color-bg-overlay:  rgba(20, 20, 74, 0.40);
+
+  /* Text */
+  --color-text-primary:    var(--primitive-light-200);
+  --color-text-secondary:  var(--primitive-light-500);
+  --color-text-muted:      var(--primitive-light-600);
+  --color-text-disabled:   var(--primitive-light-600);
+  --color-text-data:       var(--primitive-light-300);
+
+  /* Border */
+  --color-border-subtle:   var(--primitive-light-800);
+  --color-border-default:  var(--primitive-light-700);
+  --color-border-strong:   var(--primitive-light-500);
+
+  /* Interactive */
+  --color-interactive-primary:   var(--primitive-accent-light-500);
+  --color-interactive-hover:     var(--primitive-accent-light-400);
+  --color-interactive-pressed:   #2B38B0;
+  --color-interactive-subtle:    rgba(61, 78, 212, 0.08);
+  --color-interactive-disabled:  var(--primitive-light-700);
+
+  /* Status */
+  --color-status-nominal:        var(--primitive-nominal-text-light);
+  --color-status-nominal-bg:     var(--primitive-nominal-bg-light);
+  --color-status-degraded:       var(--primitive-degraded-text-light);
+  --color-status-degraded-bg:    var(--primitive-degraded-bg-light);
+  --color-status-error:          var(--primitive-error-text-light);
+  --color-status-error-bg:       var(--primitive-error-bg-light);
+  --color-status-disconnected:   #8888A8;
+  --color-status-safe:           var(--primitive-nominal-text-light);
+  --color-status-unsafe:         var(--primitive-error-text-light);
+  --color-status-caution:        var(--primitive-degraded-text-light);
+
+}

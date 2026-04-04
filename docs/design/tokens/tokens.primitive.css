@@ -1,0 +1,103 @@
+/**
+ * tokens.primitive.css
+ * ─────────────────────────────────────────────────────────────────────────────
+ * DARK SKY — Primitive Token Layer
+ *
+ * PURPOSE: Defines all raw colour values for the design system.
+ *
+ * RULES:
+ *   - These values are NEVER referenced directly in component code.
+ *   - Components and layouts reference ONLY semantic tokens (tokens.semantic.css).
+ *   - Primitives exist solely as the source of truth that semantic tokens map from.
+ *   - If you find yourself typing a primitive token name in a component, stop.
+ *
+ * MAINTENANCE:
+ *   - Updated only when the primitive palette changes (rare — requires Canvas sign-off).
+ *   - Version lock: Brand System v1.0.0
+ *
+ * SOURCE: /docs/BRAND_SYSTEM.md § 3a
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+:root {
+
+  /* ── Dark Theme Primitives ─────────────────────────────────────────────── */
+
+  --primitive-dark-950: #09090E;  /* Deepest background                      */
+  --primitive-dark-900: #0F0F18;  /* App chrome                              */
+  --primitive-dark-850: #141420;  /* Panel surfaces                          */
+  --primitive-dark-800: #1C1C28;  /* Elevated surfaces                       */
+  --primitive-dark-750: #242435;  /* Cards                                   */
+  --primitive-dark-700: #2E2E42;  /* Input fields                            */
+  --primitive-dark-600: #42425E;  /* Borders                                 */
+  --primitive-dark-500: #5E5E80;  /* Muted borders                           */
+  --primitive-dark-400: #8080A8;  /* Disabled text                           */
+  --primitive-dark-300: #A8A8C8;  /* Secondary text                          */
+  --primitive-dark-200: #C8C8E0;  /* Primary text (soft)                     */
+  --primitive-dark-100: #E8E8F4;  /* Primary text                            */
+  --primitive-dark-050: #F4F4FA;  /* High contrast text                      */
+
+  /* ── Light Theme Primitives ────────────────────────────────────────────── */
+
+  --primitive-light-950: #F8F8FC;  /* Page background                        */
+  --primitive-light-900: #F0F0F8;  /* Secondary background                   */
+  --primitive-light-850: #E8E8F2;  /* Tertiary / panel bg                    */
+  --primitive-light-800: #DCDCEC;  /* Borders                                */
+  --primitive-light-700: #C4C4DC;  /* Stronger borders                       */
+  --primitive-light-600: #9898B8;  /* Muted text                             */
+  --primitive-light-500: #6868A0;  /* Secondary text                         */
+  --primitive-light-400: #404080;  /* Body text                              */
+  --primitive-light-300: #242465;  /* Primary text                           */
+  --primitive-light-200: #14144A;  /* Strong text                            */
+
+  /* ── Accent Primitives (both themes) ───────────────────────────────────── */
+
+  --primitive-accent-500: #5B6CF5;       /* Brand primary — dark theme        */
+  --primitive-accent-400: #7B8CF8;       /* Brand hover — dark theme          */
+  --primitive-accent-600: #3D4ED4;       /* Brand pressed — dark theme        */
+  --primitive-accent-light-500: #3D4ED4; /* Brand primary — light theme       */
+  --primitive-accent-light-400: #5B6CF5; /* Brand hover — light theme         */
+
+  /* ── Status Primitives ─────────────────────────────────────────────────── */
+
+  /* Nominal (OK) */
+  --primitive-nominal-bg:           #0D2B1A;  /* Dark theme background        */
+  --primitive-nominal-text:         #34C759;  /* Dark theme text / icon       */
+  --primitive-nominal-bg-light:     #E8F7EE;  /* Light theme background       */
+  --primitive-nominal-text-light:   #1A7A3F;  /* Light theme text / icon      */
+
+  /* Degraded (Warning) */
+  --primitive-degraded-bg:          #2B1F08;  /* Dark theme background        */
+  --primitive-degraded-text:        #FF9F0A;  /* Dark theme text / icon       */
+  --primitive-degraded-bg-light:    #FFF4E0;  /* Light theme background       */
+  --primitive-degraded-text-light:  #954F00;  /* Light theme text / icon      */
+
+  /* Error (Fault) */
+  --primitive-error-bg:             #2B0A0A;  /* Dark theme background        */
+  --primitive-error-text:           #FF453A;  /* Dark theme text / icon       */
+  --primitive-error-bg-light:       #FFECEA;  /* Light theme background       */
+  --primitive-error-text-light:     #C0392B;  /* Light theme text / icon      */
+
+  /* Disconnected (Offline) */
+  --primitive-disconnected-bg:      #1A1A28;  /* Dark theme background        */
+  --primitive-disconnected-text:    #636380;  /* Dark theme text              */
+
+  /* ── Night Mode Primitives ─────────────────────────────────────────────── */
+  /* WARN: Night Mode is NOT Dark Mode. It is a red-channel-only override     */
+  /* for observatory use. Never confuse these with the dark theme primitives. */
+
+  --primitive-night-950: #0D0000;  /* Deepest background                     */
+  --primitive-night-900: #150000;  /* App chrome                             */
+  --primitive-night-850: #1E0000;  /* Panel surfaces                         */
+  --primitive-night-800: #280000;  /* Elevated surfaces                      */
+  --primitive-night-750: #330000;  /* Cards                                  */
+  --primitive-night-700: #420000;  /* Input fields                           */
+  --primitive-night-600: #5C0000;  /* Borders                                */
+  --primitive-night-500: #800000;  /* Interactive primary                    */
+  --primitive-night-400: #AA0000;  /* Interactive hover                      */
+  --primitive-night-300: #CC2222;  /* Status / accent                        */
+  --primitive-night-200: #E04444;  /* Secondary text                         */
+  --primitive-night-100: #F08080;  /* Primary text                           */
+  --primitive-night-050: #FFB0B0;  /* High contrast text                     */
+
+}

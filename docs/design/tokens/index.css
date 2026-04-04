@@ -1,0 +1,136 @@
+/**
+ * index.css
+ * ─────────────────────────────────────────────────────────────────────────────
+ * DARK SKY — CSS Entry Point
+ *
+ * PURPOSE: Imports all style layers in the correct cascade order.
+ *          This is the single CSS file imported by the app entry point.
+ *
+ * IMPORT ORDER IS SIGNIFICANT:
+ *   1. Primitives   — raw values, never referenced in components
+ *   2. Semantic     — maps primitives to intent, includes light theme override
+ *   3. Night Mode   — red-channel overrides, layers on top of any theme
+ *   4. Typography   — font loading, type scale utilities, telemetry class
+ *   5. Global reset — box model, scroll behaviour, focus ring base
+ *
+ * Component styles are NOT imported here — they are imported by their
+ * respective component files (scoped CSS modules or framework equivalent).
+ *
+ * SOURCE: /docs/BRAND_SYSTEM.md §§ 3, 4
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+@import './tokens.primitive.css';   /* Layer 1: Raw values                   */
+@import './tokens.semantic.css';    /* Layer 2: Semantic + light theme        */
+@import './tokens.night.css';       /* Layer 3: Night Mode overrides          */
+@import './typography.css';         /* Layer 4: Fonts + type scale            */
+
+/* ── Global Reset & Base ─────────────────────────────────────────────────────
+ * Minimal reset scoped to Dark Sky's needs. Not a full reset library.
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+  /* Smooth scrolling — respects Reduce Motion via the media query below       */
+  scroll-behavior: smooth;
+  /* No white flash on load — set the app background immediately               */
+  background-color: var(--color-bg-app);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden; /* Dark Sky is a single-window app — no body scroll        */
+}
+
+#root,
+#app {
+  height: 100%;
+}
+
+/* ── Night Mode Transition ───────────────────────────────────────────────────
+ * Applied by ThemeManager when [data-theme] changes to/from 'night'.
+ * Scoped to the .ds-theme-transitioning class — not always-on.
+ *
+ * CRITICAL: background-color and color transitions use CSS custom property
+ * interpolation. All values in the token system are dark or red — there is
+ * no white at any intermediate point.
+ *
+ * Transition is removed after --duration-slow (400ms) by ThemeManager.
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+.ds-theme-transitioning,
+.ds-theme-transitioning * {
+  transition:
+    background-color var(--duration-slow) var(--ease-standard),
+    color            var(--duration-slow) var(--ease-standard),
+    border-color     var(--duration-slow) var(--ease-standard),
+    box-shadow       var(--duration-slow) var(--ease-standard) !important;
+}
+
+/* ── Focus Ring Base ─────────────────────────────────────────────────────────
+ * Brand System § 13: Focus rings use --color-border-strong, 2px solid, 2px offset.
+ * Using :focus-visible so rings only appear for keyboard navigation.
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+:focus-visible {
+  outline: 2px solid var(--color-border-strong);
+  outline-offset: 2px;
+}
+
+/* Remove default focus ring when :focus-visible is supported                 */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── Selection ───────────────────────────────────────────────────────────────
+ * Use a subtle interactive colour for text selection.
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+::selection {
+  background-color: var(--color-interactive-subtle);
+  color: var(--color-text-primary);
+}
+
+/* ── Scrollbars ──────────────────────────────────────────────────────────────
+ * Custom scrollbar styling for the dark/night theme context.
+ * Chromium-only (WebKit prefix). Firefox uses scrollbar-color.
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-app);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-default);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-strong);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-default) var(--color-bg-app);
+}

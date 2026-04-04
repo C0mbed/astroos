@@ -1,0 +1,93 @@
+/**
+ * tokens.night.css
+ * ─────────────────────────────────────────────────────────────────────────────
+ * DARK SKY — Night Mode Token Overrides
+ *
+ * PURPOSE: Overrides semantic colour tokens with the red-channel-only Night
+ *          Mode palette for observatory use.
+ *
+ * ACTIVATION: Applied when [data-theme="night"] is set on <html>.
+ *
+ * IMPORTANT DISTINCTIONS:
+ *   - Night Mode is NOT Dark Mode. It is a manual override specifically for
+ *     preserving dark adaptation during observatory sessions.
+ *   - Night Mode layers on top of whichever system theme is active. It always
+ *     wins — a user can be in light mode and activate Night Mode.
+ *   - Status colours in Night Mode shift to their amber/red equivalents.
+ *     The interactive accent shifts from indigo to deep red.
+ *
+ * TRANSITION BEHAVIOUR:
+ *   - Activating Night Mode transitions the full UI in --duration-slow (400ms)
+ *     at --ease-standard. This is the one permitted full-UI transition.
+ *   - CRITICAL: The transition must interpolate dark→red ONLY.
+ *     It must NEVER pass through white at any intermediate frame.
+ *     Forge must verify intermediate states during implementation.
+ *   - Reduce Motion: instant swap, no transition.
+ *
+ * ACTIVATION MECHANISM: See src/theme.ts
+ *   - Keyboard shortcut `N` (global, guarded against input focus)
+ *   - `☾` titlebar icon click
+ *   - State persisted in localStorage key: 'theme-preference'
+ *   - Initial default: system prefers-color-scheme (if no stored preference)
+ *
+ * SOURCE: /docs/BRAND_SYSTEM.md §§ 3a (Night Mode Primitives), 3b (Semantic),
+ *         § 12 (Night Mode UX Rules)
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+[data-theme="night"] {
+
+  /* ── Background ─────────────────────────────────────────────────────────── */
+
+  --color-bg-app:      var(--primitive-night-900);          /* App chrome              */
+  --color-bg-surface:  var(--primitive-night-850);          /* Panel surfaces          */
+  --color-bg-elevated: var(--primitive-night-800);          /* Cards, popovers         */
+  --color-bg-input:    var(--primitive-night-700);          /* Input fields            */
+  --color-bg-overlay:  rgba(13, 0, 0, 0.80);                /* Modal backdrops         */
+
+  /* ── Text ───────────────────────────────────────────────────────────────── */
+
+  --color-text-primary:    var(--primitive-night-050);      /* High contrast warm red  */
+  --color-text-secondary:  var(--primitive-night-100);      /* Primary text tone       */
+  --color-text-muted:      var(--primitive-night-200);      /* Secondary text          */
+  --color-text-disabled:   var(--primitive-night-300);      /* Disabled text           */
+  --color-text-data:       var(--primitive-night-050);      /* Telemetry values        */
+
+  /* ── Border ─────────────────────────────────────────────────────────────── */
+
+  --color-border-subtle:   var(--primitive-night-600);      /* Hairline dividers       */
+  --color-border-default:  var(--primitive-night-500);      /* Component borders       */
+  --color-border-strong:   var(--primitive-night-400);      /* Focus rings             */
+
+  /* ── Interactive ────────────────────────────────────────────────────────── */
+  /* The accent shifts from indigo → deep red in Night Mode.                   */
+
+  --color-interactive-primary:   var(--primitive-night-400);        /* Deep red         */
+  --color-interactive-hover:     var(--primitive-night-300);        /* Brighter red     */
+  --color-interactive-pressed:   var(--primitive-night-500);        /* Darker red       */
+  --color-interactive-subtle:    rgba(170, 0, 0, 0.15);             /* Row hover bg     */
+  --color-interactive-disabled:  var(--primitive-night-600);        /* Disabled         */
+
+  /* ── Status ─────────────────────────────────────────────────────────────── */
+  /* Status colours shift to amber/red equivalents to stay in the red channel. */
+  /* These still pass WCAG AA contrast against Night Mode backgrounds.          */
+
+  --color-status-nominal:        #CC6600;                   /* Amber — OK              */
+  --color-status-nominal-bg:     rgba(80, 30, 0, 0.40);     /* Amber background tint   */
+  --color-status-degraded:       #CC8800;                   /* Darker amber — warning  */
+  --color-status-degraded-bg:    rgba(60, 40, 0, 0.40);     /* Warning background tint */
+  --color-status-error:          #FF4444;                   /* Bright red — error      */
+  --color-status-error-bg:       rgba(80, 0, 0, 0.40);      /* Error background tint   */
+  --color-status-disconnected:   #664444;                   /* Muted red-grey          */
+  --color-status-safe:           #CC6600;                   /* Amber — all clear       */
+  --color-status-unsafe:         #FF4444;                   /* Bright red — abort      */
+  --color-status-caution:        #CC8800;                   /* Amber — monitor         */
+
+  /* ── Elevation (Shadow) ─────────────────────────────────────────────────── */
+  /* Deeper black for shadows — reads better against red surfaces.              */
+
+  --elevation-3:  0 2px 8px rgba(0, 0, 0, 0.72);
+  --elevation-4:  0 8px 32px rgba(0, 0, 0, 0.72);
+  --elevation-5:  0 16px 48px rgba(0, 0, 0, 0.72);
+
+}
