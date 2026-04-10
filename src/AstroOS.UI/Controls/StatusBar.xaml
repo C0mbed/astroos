@@ -1,0 +1,137 @@
+<UserControl
+    x:Class="AstroOS.UI.Controls.StatusBar"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:AstroOS.UI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="40"
+    d:DesignWidth="1280">
+
+    <!--
+        StatusBar — permanent 40px strip fixed at the bottom of the app chrome.
+        Always visible in every mode. Divided into four zones: A, B, C, D.
+        Status Bar Contract v1.1.0 §1.
+
+        Zone A: Safety Panel trigger (icon button)          — 40px fixed
+        Zone B: Connection Widget (self-sizing UserControl) — min 160px, max 220px
+        Zone C: Sequencer status (out of scope this build)  — fills remaining
+        Zone D: Night Mode + Settings (out of scope)        — 40–80px
+
+        All colours via {ThemeResource} token keys — no hardcoded hex values.
+        All user-visible strings via ViewModel bindings or x:Uid resource keys.
+    -->
+
+    <!--
+        Top border: 1px color-border-default — separates from main content above.
+        Background: color-background-primary.
+        Status Bar Contract v1.1.0 §1.
+    -->
+    <Border
+        Height="40"
+        Background="{ThemeResource color-background-primary}"
+        BorderBrush="{ThemeResource color-border-default}"
+        BorderThickness="0,1,0,0">
+
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+            <Grid.ColumnDefinitions>
+                <!-- Zone A: 40px fixed — Safety Panel trigger button.
+                     Status Bar Contract v1.1.0 §2. -->
+                <ColumnDefinition Width="40"/>
+
+                <!-- Zone B: min 160px, max 220px — Connection Widget.
+                     Content-driven within these bounds; label truncates at max.
+                     Status Bar Amendment v1.2.0 §4.1 (provisional; confirmed by App Shell contract). -->
+                <ColumnDefinition MinWidth="160" MaxWidth="220" Width="Auto"/>
+
+                <!-- Zone C: fills remaining space — Sequencer status.
+                     Out of scope for Status Bar v1.1.0. -->
+                <ColumnDefinition Width="*"/>
+
+                <!-- Zone D: 40–80px — Night Mode + Settings icons.
+                     Out of scope for Status Bar v1.1.0. -->
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ═══════════════════════════════════════════════ ZONE A ══════
+                 Safety Panel trigger. Icon button occupying the full 40×40 zone.
+                 Right border: 1px color-border-subtle (separates from Zone B).
+                 Status Bar Contract v1.1.0 §2. -->
+            <Border
+                Grid.Column="0"
+                BorderBrush="{ThemeResource color-border-subtle}"
+                BorderThickness="0,0,1,0">
+
+                <Button
+                    x:Name="SafetyPanelButton"
+                    Width="40"
+                    Height="40"
+                    Padding="0"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Command="{Binding OpenSafetyPanelCommand}"
+                    AutomationProperties.Name="{Binding SafetyStatusAutomationLabel}"
+                    AutomationProperties.AutomationId="SafetyPanelTrigger"
+                    ToolTipService.ToolTip="{Binding SafetyStatusAutomationLabel}"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center">
+
+                    <!--
+                        Phosphor Shield (Duotone) 20×20px.
+                        PLATFORM: WinUI3 — Phosphor icon font not yet integrated. Using
+                        Segoe Fluent Icons shield glyph (U+E9D5) as placeholder.
+                        Replace with Phosphor ShieldDuotone path/glyph when the icon
+                        library is added to the project. Icon colour shifts to match
+                        safety state are spec'd in Status Bar Contract v1.1.0 §2 — icon
+                        states implementation deferred to Safety Panel contract build.
+                    -->
+                    <FontIcon
+                        Glyph="&#xE9D5;"
+                        FontSize="20"
+                        Foreground="{ThemeResource color-text-secondary}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"/>
+
+                </Button>
+            </Border>
+
+            <!-- ═══════════════════════════════════════════════ ZONE B ══════
+                 Connection Widget — self-sizing UserControl.
+                 Right border: 1px color-border-subtle (separates from Zone C).
+                 Internal padding managed by ConnectionWidget itself.
+                 Status Bar Contract v1.1.0 §3 + Amendment v1.2.0 §4. -->
+            <Border
+                Grid.Column="1"
+                BorderBrush="{ThemeResource color-border-subtle}"
+                BorderThickness="0,0,1,0">
+
+                <!--
+                    DataContext is set in code-behind to StatusBarViewModel.ConnectionWidget
+                    (the ConnectionWidgetViewModel instance). This keeps Zone B fully
+                    encapsulated with its own ViewModel while remaining owned by StatusBarViewModel.
+                -->
+                <controls:ConnectionWidget
+                    x:Name="ConnectionWidgetControl"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"/>
+
+            </Border>
+
+            <!-- ═══════════════════════════════════════════════ ZONE C ══════
+                 Sequencer status — out of scope for Status Bar v1.1.0.
+                 Will display active sequence name / state when Sequencer contract
+                 build is complete. Clickable (navigates to Sequencer mode).
+                 Status Bar Contract v1.1.0 §4. -->
+            <!-- Zone C: Sequencer — out of scope -->
+
+            <!-- ═══════════════════════════════════════════════ ZONE D ══════
+                 Night Mode toggle + Settings icon — out of scope for Status Bar v1.1.0.
+                 Status Bar Contract v1.1.0 §5. -->
+            <!-- Zone D: Night Mode / Settings — out of scope -->
+
+        </Grid>
+    </Border>
+
+</UserControl>

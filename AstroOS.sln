@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AstroOS.Safety.Tests", "tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AstroOS.Sequencer.Tests", "tests\AstroOS.Sequencer.Tests\AstroOS.Sequencer.Tests.csproj", "{A1B2C3D4-0012-0000-0000-000000000012}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AstroOS.UI.Tests", "tests\AstroOS.UI.Tests\AstroOS.UI.Tests.csproj", "{A1B2C3D4-0013-0000-0000-000000000013}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -36,5 +38,7 @@ Global
 		{A1B2C3D4-0001-0000-0000-000000000001}.Debug|x64.Build.0 = Debug|x64
 		{A1B2C3D4-0001-0000-0000-000000000001}.Release|x64.ActiveCfg = Release|x64
 		{A1B2C3D4-0001-0000-0000-000000000001}.Release|x64.Build.0 = Release|x64
+		{A1B2C3D4-0013-0000-0000-000000000013}.Debug|x64.ActiveCfg = Debug|x64
+		{A1B2C3D4-0013-0000-0000-000000000013}.Release|x64.ActiveCfg = Release|x64
 	EndGlobalSection
 EndGlobal

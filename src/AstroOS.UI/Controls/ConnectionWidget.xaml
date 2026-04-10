@@ -1,0 +1,345 @@
+<UserControl
+    x:Class="AstroOS.UI.Controls.ConnectionWidget"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="40"
+    d:DesignWidth="200"
+    AutomationProperties.Name="{Binding WidgetAutomationLabel}"
+    AutomationProperties.AutomationId="ConnectionWidget">
+
+    <!--
+        ConnectionWidget — Status Bar Zone B
+        Self-sizing UserControl, min 160px / max 220px (enforced by Zone B column definition).
+        Device Connect Contract v1.0.0 §2 + Status Bar Amendment v1.2.0 §3.
+
+        Layout: [8px dot/spinner]  [label, truncates with ellipsis]  [chip, animated show/hide]
+        All colours via {ThemeResource} token keys — no hardcoded hex values.
+        PLATFORM: WinUI3 — {ThemeResource} used in place of {StaticResource} to support
+        light/dark theme switching. The intent (no magic hex) is fully met.
+    -->
+
+    <Grid Height="40" HorizontalAlignment="Stretch">
+
+        <!-- ═══════════════════════════════════════════════════ VisualStateManager
+             Six states matching ConnectionState enum values.
+             Device Connect Contract v1.0.0 §2.2 + Status Bar Amendment v1.2.0 §3.1.
+
+             Animation strategy:
+               • Setters: instant property changes (brushes, Visibility, boolean flags)
+               • GeneratedDuration: interpolates double properties (MaxWidth, Opacity)
+                 between state Setter values — drives chip appear/disappear
+               • Explicit VisualTransition Storyboards: SessionReady entry/exit
+                 use the 300ms / 150ms durations from Amendment v1.2.0 §5
+               • Reduce Motion: code-behind calls GoToState(..., useTransitions: false)
+                 which skips ALL transition Storyboards and GeneratedDuration animations.
+                 Status Bar Amendment v1.2.0 §5.3.
+
+             PLATFORM: WinUI3 — SolidColorBrush Foreground/Fill cannot be smoothly
+             interpolated by GeneratedDuration (only double/Color primitives animate).
+             Label colour shifts between states are therefore instant. A Storyboard-based
+             ColorAnimation workaround would require inline brush instances and lose
+             ThemeResource awareness — not worth the trade-off. -->
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="ConnectionStates">
+
+                <!-- ── VisualTransitions ──────────────────────────────────── -->
+
+                <VisualStateGroup.Transitions>
+                    <!-- Default: all state pairs animate over 200ms.
+                         Drives chip MaxWidth + Opacity interpolation.
+                         Device Connect Contract v1.0.0 §3: "Action chip appear/dismiss 200ms." -->
+                    <!-- ANIMATE: default cross-state transition — Device Connect Contract v1.0.0 §3 -->
+                    <VisualTransition GeneratedDuration="0:0:0.2"/>
+
+                    <!-- Entering Session Ready: slower, more deliberate — reward signal.
+                         ANIMATE: entering SessionReady — Amendment v1.2.0 §5.1 (300ms ease-decelerate) -->
+                    <VisualTransition To="SessionReady" GeneratedDuration="0:0:0.3">
+                        <Storyboard>
+                            <!-- Chip expand: width + opacity, 300ms ease-decelerate -->
+                            <DoubleAnimation
+                                Storyboard.TargetName="ActionChipOuter"
+                                Storyboard.TargetProperty="MaxWidth"
+                                From="0" To="200"
+                                Duration="0:0:0.3">
+                                <DoubleAnimation.EasingFunction>
+                                    <!-- ease-decelerate — objects arriving slow down as they arrive -->
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="3"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation
+                                Storyboard.TargetName="ActionChipOuter"
+                                Storyboard.TargetProperty="Opacity"
+                                From="0" To="1"
+                                Duration="0:0:0.3">
+                                <DoubleAnimation.EasingFunction>
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="3"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </VisualTransition>
+
+                    <!-- Leaving Session Ready: fast collapse — losing readiness is informational.
+                         ANIMATE: leaving SessionReady — Amendment v1.2.0 §5.2 (150ms ease-accelerate) -->
+                    <VisualTransition From="SessionReady" GeneratedDuration="0:0:0.15">
+                        <Storyboard>
+                            <!-- Chip collapse: width + opacity, 150ms ease-accelerate -->
+                            <DoubleAnimation
+                                Storyboard.TargetName="ActionChipOuter"
+                                Storyboard.TargetProperty="MaxWidth"
+                                From="200" To="0"
+                                Duration="0:0:0.15">
+                                <DoubleAnimation.EasingFunction>
+                                    <!-- ease-accelerate — objects leaving accelerate out -->
+                                    <ExponentialEase EasingMode="EaseIn" Exponent="3"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation
+                                Storyboard.TargetName="ActionChipOuter"
+                                Storyboard.TargetProperty="Opacity"
+                                From="1" To="0"
+                                Duration="0:0:0.15">
+                                <DoubleAnimation.EasingFunction>
+                                    <ExponentialEase EasingMode="EaseIn" Exponent="3"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </VisualTransition>
+                </VisualStateGroup.Transitions>
+
+                <!-- ── STATE: AllDisconnected ─────────────────────────────────
+                     No devices connected. Hollow ring dot, muted label, "Connect All" chip.
+                     Device Connect Contract v1.0.0 §2.2: AllDisconnected spec. -->
+                <VisualState x:Name="AllDisconnected">
+                    <VisualState.Setters>
+                        <!-- Dot: hollow ring only -->
+                        <Setter Target="StatusDotFilled.Visibility"    Value="Collapsed"/>
+                        <Setter Target="StatusDotHollow.Visibility"    Value="Visible"/>
+                        <!-- Spinner: off -->
+                        <Setter Target="ConnectingSpinner.Visibility"  Value="Collapsed"/>
+                        <Setter Target="ConnectingSpinner.IsActive"    Value="False"/>
+                        <!-- Label: color-text-secondary (muted — no active connection) -->
+                        <Setter Target="StatusLabel.Foreground"        Value="{ThemeResource color-text-secondary}"/>
+                        <!-- Chip: visible, "Connect All" (text via binding) -->
+                        <Setter Target="ActionChipOuter.MaxWidth"      Value="200"/>
+                        <Setter Target="ActionChipOuter.Opacity"       Value="1"/>
+                        <Setter Target="ActionChipOuter.IsHitTestVisible" Value="True"/>
+                    </VisualState.Setters>
+                </VisualState>
+
+                <!-- ── STATE: Connecting ─────────────────────────────────────
+                     Connection in progress. Animated spinner, no chip.
+                     Device Connect Contract v1.0.0 §2.2: Connecting spec. -->
+                <VisualState x:Name="Connecting">
+                    <VisualState.Setters>
+                        <!-- Dot: hidden; spinner takes its place -->
+                        <Setter Target="StatusDotFilled.Visibility"    Value="Collapsed"/>
+                        <Setter Target="StatusDotHollow.Visibility"    Value="Collapsed"/>
+                        <!-- Spinner: active -->
+                        <Setter Target="ConnectingSpinner.Visibility"  Value="Visible"/>
+                        <Setter Target="ConnectingSpinner.IsActive"    Value="True"/>
+                        <!-- Label: color-text-secondary (process is ongoing) -->
+                        <Setter Target="StatusLabel.Foreground"        Value="{ThemeResource color-text-secondary}"/>
+                        <!-- Chip: hidden — no action available while connecting -->
+                        <Setter Target="ActionChipOuter.MaxWidth"      Value="0"/>
+                        <Setter Target="ActionChipOuter.Opacity"       Value="0"/>
+                        <Setter Target="ActionChipOuter.IsHitTestVisible" Value="False"/>
+                    </VisualState.Setters>
+                    <!-- ProgressRing animates itself via IsActive=True.
+                         No Storyboard needed for the Connecting state. -->
+                </VisualState>
+
+                <!-- ── STATE: PartiallyConnected ─────────────────────────────
+                     Some devices connected. Warning dot, "[N]/[N] Connected" label, "Connect All" chip.
+                     Device Connect Contract v1.0.0 §2.2: PartiallyConnected spec. -->
+                <VisualState x:Name="PartiallyConnected">
+                    <VisualState.Setters>
+                        <!-- Dot: warning colour — partial state is a nudge, not critical -->
+                        <Setter Target="StatusDotFilled.Visibility"    Value="Visible"/>
+                        <Setter Target="StatusDotFilled.Fill"          Value="{ThemeResource color-status-warning}"/>
+                        <Setter Target="StatusDotHollow.Visibility"    Value="Collapsed"/>
+                        <Setter Target="ConnectingSpinner.Visibility"  Value="Collapsed"/>
+                        <Setter Target="ConnectingSpinner.IsActive"    Value="False"/>
+                        <!-- Label: color-text-primary (user needs to act on this) -->
+                        <Setter Target="StatusLabel.Foreground"        Value="{ThemeResource color-text-primary}"/>
+                        <!-- Chip: visible, "Connect All" -->
+                        <Setter Target="ActionChipOuter.MaxWidth"      Value="200"/>
+                        <Setter Target="ActionChipOuter.Opacity"       Value="1"/>
+                        <Setter Target="ActionChipOuter.IsHitTestVisible" Value="True"/>
+                    </VisualState.Setters>
+                </VisualState>
+
+                <!-- ── STATE: AllConnected ───────────────────────────────────
+                     All devices connected but Session Ready conditions not all met
+                     (e.g., no site profile, safety warning active). No chip — user
+                     knows what needs to be fixed, no immediate action here.
+                     Device Connect Contract v1.0.0 §2.2: AllConnected spec. -->
+                <VisualState x:Name="AllConnected">
+                    <VisualState.Setters>
+                        <!-- Dot: success colour — devices are healthy -->
+                        <Setter Target="StatusDotFilled.Visibility"    Value="Visible"/>
+                        <Setter Target="StatusDotFilled.Fill"          Value="{ThemeResource color-status-success}"/>
+                        <Setter Target="StatusDotHollow.Visibility"    Value="Collapsed"/>
+                        <Setter Target="ConnectingSpinner.Visibility"  Value="Collapsed"/>
+                        <Setter Target="ConnectingSpinner.IsActive"    Value="False"/>
+                        <!-- Label: color-text-primary -->
+                        <Setter Target="StatusLabel.Foreground"        Value="{ThemeResource color-text-primary}"/>
+                        <!-- Chip: hidden — all connected, nothing to connect -->
+                        <Setter Target="ActionChipOuter.MaxWidth"      Value="0"/>
+                        <Setter Target="ActionChipOuter.Opacity"       Value="0"/>
+                        <Setter Target="ActionChipOuter.IsHitTestVisible" Value="False"/>
+                    </VisualState.Setters>
+                </VisualState>
+
+                <!-- ── STATE: SessionReady ───────────────────────────────────
+                     All four conditions met. Positive reward signal: green label,
+                     green dot, "Start →" CTA chip. This is the only state where the
+                     label uses a status colour (color-status-success) rather than a
+                     text colour. Status Bar Amendment v1.2.0 §3.1. -->
+                <VisualState x:Name="SessionReady">
+                    <VisualState.Setters>
+                        <!-- Dot: success — rig is ready -->
+                        <Setter Target="StatusDotFilled.Visibility"    Value="Visible"/>
+                        <Setter Target="StatusDotFilled.Fill"          Value="{ThemeResource color-status-success}"/>
+                        <Setter Target="StatusDotHollow.Visibility"    Value="Collapsed"/>
+                        <Setter Target="ConnectingSpinner.Visibility"  Value="Collapsed"/>
+                        <Setter Target="ConnectingSpinner.IsActive"    Value="False"/>
+                        <!-- Label: color-status-success — reward signal, only state with coloured label.
+                             Amendment v1.2.0 §3.1: "the one state where the label carries positive colour." -->
+                        <Setter Target="StatusLabel.Foreground"        Value="{ThemeResource color-status-success}"/>
+                        <!-- Chip: visible, "Start →" — primary CTA -->
+                        <Setter Target="ActionChipOuter.MaxWidth"      Value="200"/>
+                        <Setter Target="ActionChipOuter.Opacity"       Value="1"/>
+                        <Setter Target="ActionChipOuter.IsHitTestVisible" Value="True"/>
+                    </VisualState.Setters>
+                </VisualState>
+
+                <!-- ── STATE: ErrorPresent ───────────────────────────────────
+                     One or more devices in error state. Error dot, "[N] Error" label in
+                     error colour, "Retry" chip. Device Connect Contract v1.0.0 §2.2. -->
+                <VisualState x:Name="ErrorPresent">
+                    <VisualState.Setters>
+                        <!-- Dot: error colour -->
+                        <Setter Target="StatusDotFilled.Visibility"    Value="Visible"/>
+                        <Setter Target="StatusDotFilled.Fill"          Value="{ThemeResource color-status-error}"/>
+                        <Setter Target="StatusDotHollow.Visibility"    Value="Collapsed"/>
+                        <Setter Target="ConnectingSpinner.Visibility"  Value="Collapsed"/>
+                        <Setter Target="ConnectingSpinner.IsActive"    Value="False"/>
+                        <!-- Label: color-status-error — error is semantically significant -->
+                        <Setter Target="StatusLabel.Foreground"        Value="{ThemeResource color-status-error}"/>
+                        <!-- Chip: visible, "Retry" -->
+                        <Setter Target="ActionChipOuter.MaxWidth"      Value="200"/>
+                        <Setter Target="ActionChipOuter.Opacity"       Value="1"/>
+                        <Setter Target="ActionChipOuter.IsHitTestVisible" Value="True"/>
+                    </VisualState.Setters>
+                </VisualState>
+
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <!-- ═══════════════════════════════════════════════════ Content layout -->
+        <StackPanel
+            Orientation="Horizontal"
+            VerticalAlignment="Center"
+            Padding="12,0,8,0"
+            Spacing="8">
+
+            <!-- Status indicator: spinner (Connecting) OR filled dot OR hollow ring -->
+            <!-- The three elements are mutually exclusive via VisualState Setters.
+                 Initial state = AllDisconnected → hollow ring visible, others collapsed. -->
+            <Grid Width="12" Height="12" VerticalAlignment="Center">
+
+                <!-- Filled dot — used in PartiallyConnected, AllConnected, SessionReady, ErrorPresent.
+                     Fill set per-state via VisualState Setter. -->
+                <Ellipse
+                    x:Name="StatusDotFilled"
+                    Width="8" Height="8"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Fill="{ThemeResource color-text-tertiary}"
+                    Visibility="Collapsed"/>
+
+                <!-- Hollow ring — used in AllDisconnected: no active connection.
+                     Device Connect Contract v1.0.0 §2.2: "dot=color-border-default (hollow ring)" -->
+                <Ellipse
+                    x:Name="StatusDotHollow"
+                    Width="8" Height="8"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Fill="Transparent"
+                    Stroke="{ThemeResource color-border-default}"
+                    StrokeThickness="1.5"
+                    Visibility="Visible"/>
+
+                <!-- Spinner — used in Connecting state only.
+                     PLATFORM: WinUI3 — ProgressRing default style sets MinWidth/MinHeight
+                     via ThemeResources (typically 16px). We override with MinWidth="0"
+                     MinHeight="0" so Width="12" Height="12" take effect. Inner ring may
+                     still appear slightly larger than the spec 8px dot. Acceptable for MVP;
+                     revisit with a custom ProgressRing ControlTemplate at visual QA. -->
+                <ProgressRing
+                    x:Name="ConnectingSpinner"
+                    Width="12" Height="12"
+                    MinWidth="0" MinHeight="0"
+                    Foreground="{ThemeResource color-interactive-primary}"
+                    IsActive="False"
+                    Visibility="Collapsed"/>
+
+            </Grid>
+
+            <!-- Status label — text set via LabelText binding, style from contract.
+                 Foreground changes per state via VisualState Setters.
+                 Truncates with ellipsis at max Zone B width.
+                 Status Bar Contract v1.1.0 §7: "all text uses text-label (12px/500)." -->
+            <TextBlock
+                x:Name="StatusLabel"
+                Text="{Binding LabelText}"
+                FontSize="12"
+                FontWeight="Medium"
+                VerticalAlignment="Center"
+                TextTrimming="CharacterEllipsis"
+                MaxWidth="130"
+                Foreground="{ThemeResource color-text-secondary}"/>
+
+            <!-- Action chip container — MaxWidth animated between 0 (hidden) and 200 (visible).
+                 In WinUI 3, Border clips its child to its own RenderSize by default — no
+                 ClipToBounds property is needed (that is a WPF-only API).
+                 PLATFORM: WinUI3 — chip visibility managed via MaxWidth+Opacity rather than
+                 Visibility.Collapsed because Visibility cannot be animated with DoubleAnimation.
+                 The StackPanel Spacing=8 adds a transparent 8px gap when chip is MaxWidth=0;
+                 this is visually acceptable and avoided in future if Zone B uses Grid layout. -->
+            <Border
+                x:Name="ActionChipOuter"
+                MaxWidth="0"
+                Opacity="0"
+                IsHitTestVisible="False"
+                HorizontalAlignment="Left">
+
+                <!-- Pill-shaped action chip.
+                     Height=28, radius-full (CornerRadius=14), horizontal padding=8px.
+                     Color-interactive-primary background with white text.
+                     Status Bar Contract v1.1.0 §3 + Amendment v1.2.0 §3.1. -->
+                <Button
+                    x:Name="ChipButton"
+                    Height="28"
+                    Padding="8,0"
+                    CornerRadius="14"
+                    Background="{ThemeResource color-interactive-primary}"
+                    Foreground="White"
+                    Content="{Binding ChipLabel}"
+                    Command="{Binding ChipActionCommand}"
+                    AutomationProperties.Name="{Binding ChipAutomationLabel}"
+                    FontSize="12"
+                    FontWeight="Medium"
+                    BorderThickness="0"
+                    VerticalContentAlignment="Center"
+                    HorizontalContentAlignment="Center"/>
+
+            </Border>
+
+        </StackPanel>
+
+    </Grid>
+</UserControl>

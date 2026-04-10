@@ -20,7 +20,7 @@ Windows 11 minimum (10.0.22000.0). x64 only. Self-contained deployment.
 
 | Component | Stage | Status | Blocking |
 |---|---|---|---|
-| Status Bar | 3 — Build | 🔴 Blocked | XAML token layer not yet translated |
+| Status Bar | 3 — Build | 🟡 In Progress | Zones A+B implemented; Zones C+D stubs; visual QA pending |
 | Device Dashboard | 3 — Build | 🔴 Blocked | XAML token layer not yet translated |
 | App Shell | 2 — Contract | ⏳ Awaiting Canvas contract | — |
 | Safety Panel | 2 — Contract | ⏳ Awaiting Canvas contract | — |
