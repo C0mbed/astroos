@@ -1,6 +1,7 @@
 // src/AstroOS.UI/Controls/StatusBar.xaml.cs
 using AstroOS.UI.ViewModels;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 
 namespace AstroOS.UI.Controls;
 

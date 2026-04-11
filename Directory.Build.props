@@ -1,0 +1,54 @@
+<Project>
+  <!--
+    WindowsSdkPath: required by the WinUI 3 XamlCompiler even when the Windows SDK is not
+    installed on the machine.  Point at the SDK BuildTools NuGet package, which ships the
+    Windows SDK binaries (makepri, makeappx, etc.) but not the WinRT metadata.
+    The XAML compiler only reads WinMD files at this path when they actually exist; setting
+    the property to a real directory prevents the null-reference crash in XamlCompiler.exe
+    while allowing individual Exists() guards in the targets to skip missing WinMD lookups.
+  -->
+  <PropertyGroup>
+    <!--
+      WindowsPackageType: must be set to 'None' here (before NuGet targets run) so that
+      Microsoft.WindowsAppSDK.BootstrapCommon.targets can see it when it evaluates the
+      condition that gates WindowsAppSdkBootstrapInitialize=true.  BootstrapCommon.targets
+      is imported inside Foundation.targets (line 9 of Microsoft.WindowsAppSDK.targets),
+      while Packaging.targets — which normally defaults WindowsPackageType to 'None' — is
+      imported later via WinUI.targets (line 10).  The evaluation-time ordering means the
+      bootstrap check always sees an empty WindowsPackageType unless we pin it here.
+    -->
+    <WindowsPackageType Condition="'$(WindowsPackageType)' == ''">None</WindowsPackageType>
+    <!--
+      Point at the installed Windows SDK which contains the UnionMetadata WinMD files that
+      XamlCompiler.exe needs to resolve Windows Runtime types.  The SDK BuildTools NuGet
+      package only ships build tools (makepri, makeappx) and contains no WinMD files.
+      The Windows SDK was installed by the VS Build Tools workload at this standard path.
+    -->
+    <WindowsSdkPath Condition="'$(WindowsSdkPath)' == ''">C:\Program Files (x86)\Windows Kits\10\</WindowsSdkPath>
+    <!--
+      DisableXbfGeneration: skip binary XAML generation, which requires GenXbf.dll to be
+      loaded. GenXbf.dll depends on the Windows App Runtime MSIX package being installed.
+      On a fresh machine where the runtime MSIX is not yet installed this prevents
+      XamlCompiler.exe from crashing silently with exit code 1.
+    -->
+    <DisableXbfGeneration Condition="'$(DisableXbfGeneration)' == ''">true</DisableXbfGeneration>
+    <!--
+      IncludeCopyLocalFilesOutputGroup: prevent GetPriOutputs (unconditionally added to
+      GetCopyToOutputDirectoryItemsDependsOn by Microsoft.Build.Msix.Pri.targets) from
+      calling CopyLocalFilesOutputGroup, which requires Microsoft.Build.AppxPackage.dll
+      (a VS-only DLL absent from the dotnet CLI SDK).  For an unpackaged scaffold app
+      there are no .pri files coming from copy-local references, so this is a no-op.
+    -->
+    <IncludeCopyLocalFilesOutputGroup Condition="'$(IncludeCopyLocalFilesOutputGroup)' == ''">false</IncludeCopyLocalFilesOutputGroup>
+    <!--
+      EnableCoreMrtTooling: prevent MrtCore.PriGen.targets from being imported.
+      MrtCore.targets conditionally imports MrtCore.PriGen.targets only when this is 'true'.
+      MrtCore.PriGen.targets defines six targets (GetMrtPackagingOutputs, _GetDefaultResourceLanguage,
+      _GetPackageArchitecture, etc.) implemented via tasks in Microsoft.Build.AppxPackage.dll — a
+      VS-only DLL absent from the dotnet CLI SDK.  For an unpackaged scaffold app with no PRI
+      resources, MRT Core tooling is unused.  Setting this to 'false' here (before MrtCore.targets
+      runs) blocks the import and eliminates all AppxMSBuildTaskAssembly task-load errors.
+    -->
+    <EnableCoreMrtTooling Condition="'$(EnableCoreMrtTooling)' == ''">false</EnableCoreMrtTooling>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,110 @@
+<Project>
+  <!--
+    XamlCompiler WMC1006 fallback for WinUI 3 + .NET 9 + dotnet build
+
+    PROBLEM:
+      XamlCompiler.exe (net472) StackOverflows (STATUS_STACK_OVERFLOW) when BOTH
+      System.Runtime.dll AND System.Runtime.InteropServices.dll are in ReferenceAssemblies
+      simultaneously — always the case for .NET 9 WinUI 3 projects. Without SRI in the
+      reference list, WMC1006 fires because WinAppSDK net6.0 projection DLLs reference
+      System.Runtime.InteropServices v6.0.0.0 which CCI cannot resolve. WMC1006 causes
+      XamlCompiler.exe to exit 1 (MSB3073) with GeneratedCodeFiles=[].
+
+    FIX (two-part):
+      1. XamlCompilerWrapper.cmd/.ps1 — replaces XamlCompilerExePath. Calls the real
+         XamlCompiler.exe; when it exits 1 but wrote output.json (WMC1006 scenario, XBF
+         files are generated correctly), strips the WMC1006 MSBuildLogEntry and exits 0
+         so MSBuild's Exec task does not raise MSB3073.
+      2. _XamlWmc1006Fallback — BeforeTargets="XamlPreCompile": when GCF is empty after
+         Pass1, injects ALL pre-built fallback files (.g.i.cs + .g.cs) into @(Compile) in
+         one shot. The .g.cs files (incl. Main() in App.g.cs) have no dependency on the
+         intermediate assembly, so injecting them here is safe.
+
+    NOTE on AfterTargets / MarkupCompilePass1 / MarkupCompilePass2:
+      These targets are in WinAppSDK interop.targets, loaded via NuGet. MSBuild wires
+      AfterTargets before NuGet packages are resolved so those AfterTargets references
+      produce "does not exist" warnings and are silently dropped. BeforeTargets="XamlPreCompile"
+      works because XamlPreCompile IS visible at evaluation time and MarkupCompilePass1 is a
+      DependsOn of XamlPreCompile, so Pass1 always runs before our target fires.
+
+    MAINTENANCE:
+      If XAML files change (new x:Name fields, new x:Class roots), update the corresponding
+      files under build/xaml-fallback/AstroOS.UI/.
+  -->
+
+  <!--
+    Step 1: redirect XamlCompilerExePath to the wrapper batch file.
+    Directory.Build.targets is imported after interop.targets so this unconditionally
+    overrides the path that interop.targets sets under Condition="$(XamlCompilerExePath)==''".
+  -->
+  <PropertyGroup Condition="'$(UseWinUI)' == 'true'">
+    <XamlCompilerExePath>$(MSBuildThisFileDirectory)build\XamlCompilerWrapper.cmd</XamlCompilerExePath>
+    <!--
+      Disable PRI file expansion: the ExpandPriContent task lives in a Visual Studio DLL
+      (Microsoft.Build.Packaging.Pri.Tasks.dll) that is not present in the dotnet CLI SDK.
+      For our unpackaged scaffold app there are no localization resources, so PRI packaging
+      is a no-op at this stage.
+    -->
+    <AppxGeneratePriEnabled>false</AppxGeneratePriEnabled>
+  </PropertyGroup>
+
+  <!--
+    Step 2: inject ALL fallback files when Pass1 produced no GeneratedCodeFiles (GCF=[]).
+    BeforeTargets="XamlPreCompile" fires after MarkupCompilePass1 (a DependsOn of
+    XamlPreCompile) but before XamlPreCompile itself. Adding both .g.i.cs and .g.cs here
+    means the final compiler (CoreCompile) also sees Main() without a separate Pass2 hook.
+    Uses **\*.g.i.cs and **\*.g.cs to cover root and subdirectories without duplicates.
+  -->
+  <Target Name="_XamlWmc1006Fallback"
+          BeforeTargets="XamlPreCompile"
+          Condition="'$(UseWinUI)' == 'true' and '@(_GeneratedCodeFiles)' == ''">
+    <ItemGroup>
+      <!-- Inject pre-built C# code files so CoreCompile has InitializeComponent stubs -->
+      <Compile Include="$(MSBuildThisFileDirectory)build\xaml-fallback\$(MSBuildProjectName)\**\*.g.i.cs" />
+      <Compile Include="$(MSBuildThisFileDirectory)build\xaml-fallback\$(MSBuildProjectName)\**\*.g.cs" />
+    </ItemGroup>
+    <Message Text="AstroOS: WMC1006 fallback active -- injecting pre-built .g.i.cs + .g.cs for $(MSBuildProjectName)" Importance="high" />
+  </Target>
+
+  <!--
+    Step 3: shadow GetMrtPackagingOutputs with a no-op override.
+    MrtCore.PriGen.targets defines six tasks from Microsoft.Build.AppxPackage.dll — a
+    VS-only DLL absent from the dotnet CLI SDK.  GetMrtPackagingOutputs is the entry-point
+    target that calls those tasks (ExpandPayloadDirectories, RemovePayloadDuplicates, …).
+    It is unconditionally added to GetCopyToOutputDirectoryItemsDependsOn by
+    Microsoft.Build.Msix.Pri.targets.  For an unpackaged scaffold app that sets
+    AppxGeneratePriEnabled=false there are no packaging outputs to collect, so returning
+    an empty list is correct.  Directory.Build.targets is imported last, so this definition
+    wins over the one in MrtCore.PriGen.targets.
+  -->
+  <Target Name="GetMrtPackagingOutputs"
+          Returns="@(PackagingOutputs)"
+          Condition="'$(UseWinUI)' == 'true' and '$(AppxGeneratePriEnabled)' != 'true'" />
+
+  <!--
+    Step 4: re-stage XAML obj copies immediately before GetCopyToOutputDirectoryItems.
+    AddProcessedXamlFilesToCopyLocal (WinUI.NET.Markup.Compiler.targets, BeforeTargets=
+    "GetCopyToOutputDirectoryItems") registers $(IntermediateOutputPath)\%(Identity) copies
+    of every XAML page as CopyToOutputDirectory=PreserveNewest items. XamlCompiler normally
+    creates those copies during Pass1; since it crashed they are absent (or may be deleted
+    by IncrementalClean between _XamlWmc1006Fallback and this point). We reproduce them here
+    so _CopyOutOfDateSourceItemsToOutputDirectory always finds a valid source to copy from.
+
+    Both targets are BeforeTargets="GetCopyToOutputDirectoryItems"; Directory.Build.targets
+    is imported AFTER the WinAppSDK .targets so this target runs after
+    AddProcessedXamlFilesToCopyLocal, meaning the item group it needs (_GeneratedCodeFiles
+    still empty) is stable.
+  -->
+  <Target Name="_XamlEnsureObjCopies"
+          BeforeTargets="GetCopyToOutputDirectoryItems"
+          Condition="'$(UseWinUI)' == 'true' and '@(_GeneratedCodeFiles)' == ''">
+    <ItemGroup>
+      <_XamlObjStagingSources Include="@(ApplicationDefinition);@(Page)" />
+    </ItemGroup>
+    <MakeDir Directories="@(_XamlObjStagingSources->'$(IntermediateOutputPath)%(RelativeDir)')" />
+    <Copy SourceFiles="@(_XamlObjStagingSources->'%(FullPath)')"
+          DestinationFiles="@(_XamlObjStagingSources->'$(IntermediateOutputPath)%(Identity)')"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

@@ -3,6 +3,7 @@ using System.ComponentModel;
 using AstroOS.UI.Models;
 using AstroOS.UI.ViewModels;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Windows.UI.ViewManagement;
 
 namespace AstroOS.UI.Controls;
