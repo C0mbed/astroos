@@ -40,15 +40,5 @@
       there are no .pri files coming from copy-local references, so this is a no-op.
     -->
     <IncludeCopyLocalFilesOutputGroup Condition="'$(IncludeCopyLocalFilesOutputGroup)' == ''">false</IncludeCopyLocalFilesOutputGroup>
-    <!--
-      EnableCoreMrtTooling: prevent MrtCore.PriGen.targets from being imported.
-      MrtCore.targets conditionally imports MrtCore.PriGen.targets only when this is 'true'.
-      MrtCore.PriGen.targets defines six targets (GetMrtPackagingOutputs, _GetDefaultResourceLanguage,
-      _GetPackageArchitecture, etc.) implemented via tasks in Microsoft.Build.AppxPackage.dll — a
-      VS-only DLL absent from the dotnet CLI SDK.  For an unpackaged scaffold app with no PRI
-      resources, MRT Core tooling is unused.  Setting this to 'false' here (before MrtCore.targets
-      runs) blocks the import and eliminates all AppxMSBuildTaskAssembly task-load errors.
-    -->
-    <EnableCoreMrtTooling Condition="'$(EnableCoreMrtTooling)' == ''">false</EnableCoreMrtTooling>
   </PropertyGroup>
 </Project>

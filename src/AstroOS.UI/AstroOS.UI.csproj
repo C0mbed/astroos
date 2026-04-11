@@ -6,6 +6,7 @@
     <RootNamespace>AstroOS.UI</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>x64</Platforms>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>false</EnableMsixTooling>
@@ -19,7 +20,10 @@
     -->
     <NoWarn>$(NoWarn);MVVMTK0045</NoWarn>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <SelfContained>true</SelfContained>
+    <SelfContained>false</SelfContained>
+    <WindowsAppSDKSelfContained>false</WindowsAppSDKSelfContained>
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSdkDeploymentManagerInitialize>false</WindowsAppSdkDeploymentManagerInitialize>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.250907003" />
@@ -36,4 +40,11 @@
     <ProjectReference Include="..\AstroOS.Api\AstroOS.Api.csproj" />
     <ProjectReference Include="..\AstroOS.Storage\AstroOS.Storage.csproj" />
   </ItemGroup>
+
+  <Target Name="CopyPriToRidOutput" AfterTargets="Build">
+    <Copy SourceFiles="$(OutputPath)..\resources.pri"
+          DestinationFiles="$(OutputPath)resources.pri"
+          Condition="Exists('$(OutputPath)..\resources.pri') AND !Exists('$(OutputPath)resources.pri')" />
+  </Target>
+
 </Project>
