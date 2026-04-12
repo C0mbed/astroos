@@ -3,9 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:AstroOS.UI.Controls"
-    Title="Dark Sky"
-    MinWidth="1024"
-    MinHeight="700">
+    Title="Dark Sky">
 
     <!--
         Temporary scaffold layout: main content area above, Status Bar pinned at bottom.

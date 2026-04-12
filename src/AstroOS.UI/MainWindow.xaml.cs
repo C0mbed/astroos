@@ -15,6 +15,7 @@ public sealed partial class MainWindow : Window
     public MainWindow(IServiceProvider services)
     {
         InitializeComponent();
+        AppWindow.Resize(new Windows.Graphics.SizeInt32(1024, 700));
 
         // Resolve and wire the Status Bar ViewModel. The StatusBar code-behind
         // (StatusBar.xaml.cs) forwards ConnectionWidget's DataContext from this VM.
