@@ -25,6 +25,17 @@
     <WindowsPackageType>None</WindowsPackageType>
     <WindowsAppSdkDeploymentManagerInitialize>false</WindowsAppSdkDeploymentManagerInitialize>
   </PropertyGroup>
+  <!--
+    WORKAROUND: WinAppSDK 1.8 sets DisableXbfGeneration=true when TargetPlatformVersion
+    resolves to 8.0 for unpackaged WindowsPackageType=None builds. This prevents XBF
+    compilation entirely, causing STATUS_STOWED_EXCEPTION at runtime when
+    Microsoft.UI.Xaml.dll cannot load compiled XAML resources.
+    Force XBF generation on. Re-evaluate when upgrading past WinAppSDK 1.8.
+  -->
+  <PropertyGroup>
+    <DisableXbfGeneration>false</DisableXbfGeneration>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.250907003" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4654" />

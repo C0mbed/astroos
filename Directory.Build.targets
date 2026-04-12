@@ -38,14 +38,6 @@
     overrides the path that interop.targets sets under Condition="$(XamlCompilerExePath)==''".
   -->
   <PropertyGroup Condition="'$(UseWinUI)' == 'true'">
-    <XamlCompilerExePath>$(MSBuildThisFileDirectory)build\XamlCompilerWrapper.cmd</XamlCompilerExePath>
-    <!--
-      Disable PRI file expansion: the ExpandPriContent task lives in a Visual Studio DLL
-      (Microsoft.Build.Packaging.Pri.Tasks.dll) that is not present in the dotnet CLI SDK.
-      For our unpackaged scaffold app there are no localization resources, so PRI packaging
-      is a no-op at this stage.
-    -->
-    <AppxGeneratePriEnabled>false</AppxGeneratePriEnabled>
   </PropertyGroup>
 
   <!--
