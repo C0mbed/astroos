@@ -1,0 +1,127 @@
+<svg width="340" height="56" viewBox="0 0 340 56"
+     xmlns="http://www.w3.org/2000/svg"
+     role="img" aria-label="Dark Sky wordmark">
+  <title>Dark Sky</title>
+  <defs>
+
+    <!-- Scaled-down accretion disc gradient for wordmark mark -->
+    <radialGradient id="wm-disc"
+                    cx="28" cy="28" r="22.3"
+                    gradientUnits="userSpaceOnUse">
+      <stop offset="0"     stop-color="#000000"/>
+      <stop offset="0.450" stop-color="#000000"/>
+      <stop offset="0.456" stop-color="#D4FFFF"/>
+      <stop offset="0.468" stop-color="#00CFEB"/>
+      <stop offset="0.500" stop-color="#00C4E0"/>
+      <stop offset="0.560" stop-color="#009ABF"/>
+      <stop offset="0.640" stop-color="#006899"/>
+      <stop offset="0.730" stop-color="#003660"/>
+      <stop offset="0.820" stop-color="#001428"/>
+      <stop offset="0.920" stop-color="#0C1322"/>
+      <stop offset="1.000" stop-color="#0B1220"/>
+    </radialGradient>
+
+    <!-- Corona glow for wordmark mark -->
+    <filter id="wm-coronaGlow"
+            x="-15%" y="-15%" width="130%" height="130%"
+            color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="0.4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Ring outer glow for wordmark mark -->
+    <filter id="wm-ringAtmosphere"
+            x="-20%" y="-20%" width="140%" height="140%"
+            color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.2" result="blur"/>
+      <feColorMatrix in="blur" type="matrix"
+        values="0 0 0 0 0  0 0.85 0 0 0.82  0 0 1 0 0.95  0 0 0 0.3 0"
+        result="tealHaze"/>
+      <feMerge>
+        <feMergeNode in="tealHaze"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <clipPath id="wm-iconClip">
+      <rect x="0" y="0" width="56" height="56" rx="6" ry="6"/>
+    </clipPath>
+
+  </defs>
+
+  <!-- === MARK BACKGROUND (56×56) === -->
+  <rect x="0" y="0" width="56" height="56" rx="6" ry="6" fill="#0B1220"/>
+
+  <!-- === MARK DISC === -->
+  <circle cx="28" cy="28" r="22.3"
+          fill="url(#wm-disc)"
+          filter="url(#wm-ringAtmosphere)"
+          clip-path="url(#wm-iconClip)"/>
+
+  <!-- === MARK VOID === -->
+  <circle cx="28" cy="28" r="10.1" fill="#000000"/>
+
+  <!-- === MARK CORONA === -->
+  <circle cx="28" cy="28" r="10.35"
+          fill="none"
+          stroke="#CCFFFF"
+          stroke-width="0.3"
+          opacity="0.80"
+          filter="url(#wm-coronaGlow)"/>
+
+  <!-- === WORDMARK TEXT ===
+
+       Typography: Space Grotesk 700
+       Style: All caps, letter-spacing 0.12em
+       Colour: #F0F4F8 (off-white — warmer than pure white, easier on eye)
+       Size: 28px — sized to vertically align with the 56px mark container
+
+       "DARK" and "SKY" are separate tspans to allow:
+         - Optional colour differentiation in future
+         - The space between words acts as a natural pause
+
+       Note for Forge: Space Grotesk must be loaded via @font-face or
+       Google Fonts CDN before this SVG renders correctly.
+       Fallback: 'DM Sans', 'Helvetica Neue', sans-serif
+  -->
+  <text
+    x="76"
+    y="36"
+    font-family="'Space Grotesk', 'DM Sans', 'Helvetica Neue', sans-serif"
+    font-size="28"
+    font-weight="700"
+    letter-spacing="3.4"
+    fill="#EEF2F6"
+    dominant-baseline="auto">
+    <tspan>DARK</tspan>
+    <tspan dx="10"> SKY</tspan>
+  </text>
+
+  <!--
+    === WORDMARK USAGE NOTES ===
+
+    Horizontal lockup dimensions at base size:
+    - Mark: 56 × 56px
+    - Gap: 20px (space-5)
+    - Text: "DARK SKY" at 28px / 700 / 0.12em tracking
+    - Total width: ~340px
+
+    Minimum size: 180px wide (mark becomes 32×32, text 16px)
+    Below 180px: use mark only, no wordmark
+
+    Approved backgrounds:
+    - Dark: #0B1220, #12192A, #0A0E1A (near-black navy range)
+    - Light: Not currently specified — wordmark is dark-theme only in V1
+
+    Do not:
+    - Alter letter-spacing
+    - Use any weight other than 700
+    - Use lower case
+    - Place on mid-grey backgrounds (insufficient contrast)
+    - Separate mark from text beyond the specified gap
+  -->
+
+</svg>

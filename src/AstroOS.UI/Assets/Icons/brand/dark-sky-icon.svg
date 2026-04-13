@@ -1,0 +1,156 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024"
+     xmlns="http://www.w3.org/2000/svg"
+     role="img" aria-label="Dark Sky — accretion disc icon">
+  <title>Dark Sky</title>
+  <defs>
+
+    <!-- === ACCRETION DISC GRADIENT ===
+         Radial gradient centred on 512,512 with r=406.
+         Stops calculated in userSpaceOnUse coordinates.
+         
+         Void edge sits at r=184px from centre.
+         184/406 = 0.453 — this is where the ring begins.
+         
+         Ring zones:
+           0.453–0.460  inner corona  (near-white teal, extreme heat)
+           0.460–0.520  hot zone      (electric teal, brand accent)
+           0.520–0.660  mid ring      (azure teal, main mass)
+           0.660–0.800  cooling zone  (deep teal fading)
+           0.800–0.940  outer fade    (to background colour)
+           0.940–1.000  background    (#0B1220)
+    -->
+    <radialGradient id="disc"
+                    cx="512" cy="512" r="406"
+                    gradientUnits="userSpaceOnUse">
+      <!-- Void core -->
+      <stop offset="0"     stop-color="#000000"/>
+      <stop offset="0.450" stop-color="#000000"/>
+      <!-- Inner corona transition — very bright, narrow band -->
+      <stop offset="0.456" stop-color="#D4FFFF" stop-opacity="1"/>
+      <!-- Hot zone — electric teal, brand accent -->
+      <stop offset="0.468" stop-color="#00CFEB"/>
+      <stop offset="0.500" stop-color="#00C4E0"/>
+      <!-- Main ring mass — rich azure teal -->
+      <stop offset="0.560" stop-color="#009ABF"/>
+      <stop offset="0.640" stop-color="#006899"/>
+      <!-- Cooling outer ring -->
+      <stop offset="0.730" stop-color="#003660"/>
+      <!-- Outer atmospheric fade -->
+      <stop offset="0.820" stop-color="#001428"/>
+      <stop offset="0.920" stop-color="#0C1322"/>
+      <!-- Merges into background -->
+      <stop offset="1.000" stop-color="#0B1220"/>
+    </radialGradient>
+
+    <!-- === RING OUTER GLOW ===
+         Soft teal atmospheric glow extending beyond the ring's outer edge.
+         Applied to the disc circle — black void area produces no glow
+         so only the ring edge glows outward. -->
+    <filter id="ringAtmosphere"
+            x="-18%" y="-18%" width="136%" height="136%"
+            color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="blur"/>
+      <!-- Tint the blur teal -->
+      <feColorMatrix in="blur" type="matrix"
+        values="0    0    0    0    0
+                0    0.85 0    0    0.82
+                0    0    1    0    0.95
+                0    0    0    0.28 0"
+        result="tealHaze"/>
+      <feMerge>
+        <feMergeNode in="tealHaze"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- === INNER CORONA GLOW ===
+         Applied to the thin corona stroke sitting on the void edge.
+         Creates the bright event-horizon line effect. -->
+    <filter id="coronaGlow"
+            x="-8%" y="-8%" width="116%" height="116%"
+            color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- === ICON SHAPE CLIP ===
+         Rounds the icon corners to platform convention (rx=110 ≈ 10.7%).
+         Windows icon standard: no forced rounding at OS level, but
+         this built-in rounding makes the mark feel considered at all sizes. -->
+    <clipPath id="iconShape">
+      <rect x="0" y="0" width="1024" height="1024" rx="108" ry="108"/>
+    </clipPath>
+
+    <!-- === SPACE DEPTH NOISE ===
+         Very subtle feTurbulence to give the background a sense of
+         cosmic depth rather than flat solid fill.
+         Opacity constrained to 3% — presence only, never texture. -->
+    <filter id="spaceDepth">
+      <feTurbulence type="fractalNoise" baseFrequency="0.55"
+                    numOctaves="4" seed="42" stitchTiles="stitch"
+                    result="noise"/>
+      <feColorMatrix in="noise" type="saturate" values="0" result="grayNoise"/>
+      <feBlend in="SourceGraphic" in2="grayNoise" mode="soft-light"
+               result="depthBlend"/>
+      <feComponentTransfer in="depthBlend">
+        <feFuncA type="linear" slope="0.03"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode in="SourceGraphic"/>
+        <feMergeNode/>
+      </feMerge>
+    </filter>
+
+  </defs>
+
+  <!-- === LAYER 1: BACKGROUND ===
+       Deep space navy. True #000000 would read as "empty" at small sizes —
+       #0B1220 has just enough warmth and saturation to feel like space. -->
+  <rect x="0" y="0" width="1024" height="1024" rx="108" ry="108"
+        fill="#0B1220"/>
+
+  <!-- === LAYER 2: ACCRETION DISC ===
+       The full radial gradient circle. Includes both void zone (black gradient)
+       and ring zone (teal gradient fading to background).
+       The outer glow filter creates atmospheric haze beyond the ring edge.
+
+       r=406 positions the ring outer edge with a clean 106px margin
+       to canvas edge on each side — safely inside the 108px corner radius. -->
+  <circle cx="512" cy="512" r="406"
+          fill="url(#disc)"
+          filter="url(#ringAtmosphere)"
+          clip-path="url(#iconShape)"/>
+
+  <!-- === LAYER 3: VOID ===
+       Pure #000000. Absolute absence of light.
+       This is drawn on top of the gradient to guarantee the void
+       is true black — no gradient bleed, no colour cast.
+       r=184 is sized so the gradient's void zone (r=0–183) and this
+       circle perfectly align at the ring's inner edge. -->
+  <circle cx="512" cy="512" r="184" fill="#000000"/>
+
+  <!-- === LAYER 4: INNER CORONA ===
+       The event horizon / photon ring — the most luminous point in the system.
+       A thin, glowing ring at the exact inner edge of the accretion disc.
+
+       r=185 + stroke-width=5: spans radii 182.5–187.5px, overlapping
+       the void edge by 1.5px and the ring inner zone by 3.5px.
+
+       This element has its own glow filter, creating a soft radial bloom
+       that reads as intense heat at the boundary.
+
+       Scientific resonance: this references the photon sphere, the
+       theoretical bright ring visible around a black hole where light
+       orbits. Intentional, not decorative. Most viewers will read it
+       as a hot inner edge. The right person will know what it is. -->
+  <circle cx="512" cy="512" r="185"
+          fill="none"
+          stroke="#CCFFFF"
+          stroke-width="5"
+          opacity="0.82"
+          filter="url(#coronaGlow)"/>
+
+</svg>
