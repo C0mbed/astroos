@@ -136,4 +136,17 @@
 
     </ResourceDictionary.ThemeDictionaries>
 
+    <!--
+        ════════════════════════════════════════════════════ FONT FAMILIES
+        Non-themed: font identity does not change between light and dark.
+        Files must exist in Assets/Fonts/ and be included as Content items
+        (SDK auto-includes Assets/**/* for WinUI3 builds).
+
+        FONT FILE REQUIREMENT:
+          Assets/Fonts/static/SpaceGrotesk-Bold.ttf — Space Grotesk 700 (static)
+          Also in repo: SpaceGrotesk-VariableFont_wght.ttf + OFL.txt + README.txt
+          Source: Google Fonts — OFL 1.1 — included in repo, licence confirmed.
+    -->
+    <FontFamily x:Key="font-brand-display">ms-appx:///Assets/Fonts/static/SpaceGrotesk-Bold.ttf#Space Grotesk</FontFamily>
+
 </ResourceDictionary>
